@@ -47,18 +47,30 @@ def test_lack_parameter(client):
     :param client: TestClient object
     :return:
     """
-    new_name = ".env.rename"
-    try:
-        env_file.rename(new_name)
-        environ.pop("SYNO_DDNS_HOSTNAME")
-        data = {"api": "cloud_flare", "myip": "123"}
-        response = client.get("/", query_string=data)
-        assert Rs.BAD_REQUEST.value == response.text
-    except AssertionError as error:  # pragma:no cover
-        print(error)
-        print(format_exc())
-    finally:
-        env_file.with_name(new_name).rename(".env")
+    if env_file.exists():
+        new_name = ".env.rename"
+        try:
+            env_file.rename(new_name)
+            environ.pop("SYNO_DDNS_HOSTNAME")
+            data = {"api": "cloud_flare", "myip": "123"}
+            response = client.get("/", query_string=data)
+            assert Rs.BAD_REQUEST.value == response.text
+        except AssertionError as error:  # pragma:no cover
+            print(error)
+            print(format_exc())
+        finally:
+            env_file.with_name(new_name).rename(".env")
+    else:
+        hostname = environ.pop("SYNO_DDNS_HOSTNAME")
+        try:
+            data = {"api": "cloud_flare", "myip": "123"}
+            response = client.get("/", query_string=data)
+            assert Rs.BAD_REQUEST.value == response.text
+        except AssertionError as error:  # pragma:no cover
+            print(error)
+            print(format_exc())
+        finally:
+            environ["SYNO_DDNS_HOSTNAME"] = hostname
 
 
 # pylint: disable=redefined-outer-name
