@@ -47,7 +47,7 @@ def test_lack_parameter(client):
     :param client: TestClient object
     :return:
     """
-    if env_file.exists():
+    if env_file.exists():  # pragma: no cover
         new_name = ".env.rename"
         try:
             env_file.rename(new_name)
