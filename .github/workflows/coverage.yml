@@ -1,0 +1,42 @@
+---
+name: Coverage Test
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+      - name: Install dependencies
+        run: |
+          pip install -r tests/requirements.txt
+      - name: Run tests with coverage
+        env:
+          SYNO_DDNS_HOSTNAME: ${{ secrets.SYNO_DDNS_HOSTNAME }}
+          SYNO_DDNS_USERNAME: ${{ secrets.SYNO_DDNS_USERNAME }}
+          SYNO_DDNS_CLOUDFLARE_USER_TOKEN: ${{ secrets.SYNO_DDNS_CLOUDFLARE_USER_TOKEN }}
+          SYNO_DDNS_CLOUDFLARE_ACCOUNT_ID: ${{ secrets.SYNO_DDNS_CLOUDFLARE_ACCOUNT_ID }}
+          SYNO_DDNS_CLOUDFLARE_ACCOUNT_TOKEN: ${{ secrets.SYNO_DDNS_CLOUDFLARE_ACCOUNT_TOKEN }}
+          SYNO_DDNS_PASSWORD: ${{ secrets.SYNO_DDNS_PASSWORD }}
+        run: |
+          coverage run -m pytest -v --capture=no --show-capture=all
+      - name: Generate coverage report
+        run: |
+          coverage xml
+          coverage html
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+      - name: Archive HTML coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html
+          path: htmlcov
