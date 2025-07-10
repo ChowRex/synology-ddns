@@ -364,7 +364,7 @@ Make sure:
 3. Click `Add` button, then input `Service Provider`&`Query URL`, then click `Save` button.
 
     - Service Provider: *CloudFlare*
-    - Webhook URL: *https://ddns.example.com/?api=cloud_flare&hostname=\_\_HOSTNAME\_\_&myip=\_\_MYIP\_\_&username=\_\_USERNAME\_\_&password=\_\_PASSWORD\_\_*
+    - Webhook URL: *https://ddns.example.com/?api=cloud_flare&hostname=__HOSTNAME__&myip=__MYIP__&username=__USERNAME__&password=__PASSWORD__*
 
     ![CreateANewDDNSProvider](synology_ddns/static/image/CreateANewDDNSProvider.png)
 
@@ -396,28 +396,36 @@ As mentioned above, a typical standard query URL would look like this:
 
 ```http
 
-http(s)://Custom-DDNS-Provider.domain.com?HOSTNAME=__HOSTNAME__&MYIP=__MYIP__&USERNAME=__USERNAME__&PASSWORD=__PASSWORD__&PARAM1=value1&PARAM2=Value2
+https://Custom-DDNS-Provider.domain.com?HOSTNAME=__HOSTNAME__&MYIP=__MYIP__&USERNAME=__USERNAME__&PASSWORD=__PASSWORD__&PARAM1=value1&PARAM2=Value2
 ```
 
 #### Official configuration
 
 We can find some useful information from the `/etc/ddns_provider.conf`
 
->  Input:
->     1. DynDNS style request:
->        modulepath = DynDNS
->        queryurl = [Update URL]?[Query Parameters]
+> Input:
+> 
+>   1. DynDNS style request:
+> 
+>      modulepath = DynDNS
+> 
+>      queryurl = [Update URL]?[Query Parameters]
 >
->     2. Self-defined module:
->        modulepath = /sbin/xxxddns
->        queryurl = DDNS_Provider_Name
+>   2. Self-defined module:
+> 
+>      modulepath = /sbin/xxxddns
+> 
+>      queryurl = DDNS_Provider_Name
 >
->    Our service will assign parameters in the following order when calling module:
->        (\$1=username, \$2=password, \$3=hostname, \$4=ip)
+> Our service will assign parameters in the following order when calling module:
+> 
+> (\$1=username, \$2=password, \$3=hostname, \$4=ip)
 >
->  Output:
->     When you write your own module, you can use the following words to tell user what happen by print it.
->     You can use your own message, but there is no multiple-language support.
+> Output:
+> 
+> When you write your own module, you can use the following words to tell user what happen by print it.
+> 
+> You can use your own message, but there is no multiple-language support.
 >
 > - good -  Update successfully.
 > - nochg - Update successfully but the IP address have not changed.
@@ -433,8 +441,10 @@ We can find some useful information from the `/etc/ddns_provider.conf`
 > ...
 >
 > [DYNDNS.org]
->         modulepath=DynDNS
->         queryurl=https://members.dyndns.org/nic/update?hostname=__HOSTNAME__&myip=__MYIP__&system=dyndns&wildcard=NOCHG&mx=NOCHG&backmx=NOCHG
+> 
+> modulepath=DynDNS
+> 
+> queryurl=https://members.dyndns.org/nic/update?hostname=__HOSTNAME__&myip=__MYIP__&system=dyndns&wildcard=NOCHG&mx=NOCHG&backmx=NOCHG
 >
 > ...
 
@@ -446,8 +456,8 @@ I've tried a few ways to understand exactly what's going on behind the scenes
 
     ```ini
     [USER_TEST]
-            queryurl=https://api.example.com?hostname=__HOSTNAME__&myip=__MYIP__&username=__USERNAME__&password=__PASSWORD__
-            modulepath=DynDNS
+      queryurl=https://api.example.com?hostname=__HOSTNAME__&myip=__MYIP__&username=__USERNAME__&password=__PASSWORD__
+      modulepath=DynDNS
     ```
 
     As you can see , the `DynDNS` is the default custom provider's module, although I didn't find it system-wide.
