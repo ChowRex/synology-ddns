@@ -85,7 +85,7 @@ class AbstractDDNSProvider(ABC):
         :raises: NotFQDNError
         """
         hostname = params.hostname
-        regex = cmp(r'^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$')
+        regex = cmp(r"^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$")
         if not match(regex, hostname):
             msg = f"{hostname} is not a valid FQDN"
             current_app.logger.error(msg)

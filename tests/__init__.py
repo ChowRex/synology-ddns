@@ -14,7 +14,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from pytest import fixture
 
-from synology_ddns import app
+from synology_ddns.main import app
 
 basicConfig(level=DEBUG, format="%(levelname)s %(name)s %(lineno)d %(message)s")
 env_file = Path(__file__).parent.with_name(".env")
@@ -30,7 +30,7 @@ def client():
     Create a Flask test client
     :return:
     """
-    app.config['TESTING'] = True
+    app.config["TESTING"] = True
 
     # pylint: disable=redefined-outer-name
     with app.test_client() as client:

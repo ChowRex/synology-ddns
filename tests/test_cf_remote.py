@@ -60,7 +60,7 @@ def test_zone_id_not_found_error(client):
         "api": "cloud_flare",
         "myip": "123",
         "username": "example.com",
-        "password": CLOUDFLARE_USER_TOKEN
+        "password": CLOUDFLARE_USER_TOKEN,
     }
     response = client.get("/", query_string=data)
     assert Rs.NO_HOST.value == response.text
@@ -76,7 +76,7 @@ def test_account_token_success(client):
     data = {
         "api": "cloud_flare",
         "myip": "1.2.3.4",
-        "password": CLOUDFLARE_ACCOUNT_TOKEN
+        "password": CLOUDFLARE_ACCOUNT_TOKEN,
     }
     response = client.get("/", query_string=data)
     assert Rs.OK.value == response.text
@@ -93,7 +93,7 @@ def test_cached_record_success(client):
         "api": "cloud_flare",
         "myip": "2.3.4.5",
         "password": CLOUDFLARE_USER_TOKEN,
-        "test": True
+        "test": True,
     }
     response = client.get("/", query_string=data)
     assert Rs.OK.value == response.text
@@ -110,7 +110,7 @@ def test_create_new_record_success(client):
         "api": "cloud_flare",
         "myip": "1.2.3.4",
         "password": CLOUDFLARE_USER_TOKEN,
-        "force": True
+        "force": True,
     }
     response = client.get("/", query_string=data)
     assert Rs.OK.value == response.text

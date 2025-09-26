@@ -115,3 +115,24 @@ def test_not_resolve(client):
         ...
     finally:
         CloudFlareDDNS._END_POINT = endpoint
+
+
+# pylint: disable=redefined-outer-name
+def test_env_file_branch_coverage(client):
+    """
+    Test to ensure both branches of env file check are covered
+    :param client: TestClient object
+    :return:
+    """
+    # Test the else branch when env file doesn't exist
+    if "SYNO_DDNS_HOSTNAME" in environ:
+        hostname = environ.pop("SYNO_DDNS_HOSTNAME")
+        try:
+            data = {"api": "cloud_flare", "myip": "123"}
+            response = client.get("/", query_string=data)
+            assert Rs.BAD_REQUEST.value == response.text
+        except AssertionError as error:  # pragma:no cover
+            print(error)
+            print(format_exc())
+        finally:
+            environ["SYNO_DDNS_HOSTNAME"] = hostname

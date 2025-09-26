@@ -9,11 +9,11 @@ Entrance point for WSGI
 """
 from logging import basicConfig, DEBUG
 
-from synology_ddns import application
+from synology_ddns.main import app as application
 
 application.config["ENV"] = "production"
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     basicConfig(level=DEBUG)
     application.config["ENV"] = "development"
     application.debug = True

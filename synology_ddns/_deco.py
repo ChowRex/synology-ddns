@@ -7,18 +7,28 @@ Decorators module
 - Created Time: 2025/7/1 15:50
 - Copyright: Copyright © 2025 Rex Zhou. All rights reserved.
 """
-from traceback import format_exc
 from functools import wraps
+from re import sub
+from traceback import format_exc
 from typing import Callable
 
 from flask import current_app
 
 from ._exceptions import NotFQDNError, RecordNotChangedError, NoResolveForEndpointError
+from ._exceptions import OverHeatError, NoHostError, APIError
 from ._exceptions import ProviderNotFoundError, ProviderNotSupportedError
 from ._exceptions import RequiredParametersNotFoundError, InvalidPasswordError
-from ._exceptions import OverHeatError, NoHostError, APIError
 from ._response import ResponseString as Rs
 from ._verify import APIProviders
+
+
+def sanitize_error_message(message: str) -> str:
+    """Remove sensitive information from error messages"""
+    # Remove potential API tokens/keys (alphanumeric strings > 20 chars)
+    message = sub(r"[A-Za-z0-9_-]{20,}", "[REDACTED]", message)
+    # Remove potential passwords in URLs
+    message = sub(r"password=[^&\s]+", "password=[REDACTED]", message)
+    return message
 
 
 def handle_exceptions(function: Callable):
@@ -53,8 +63,14 @@ def handle_exceptions(function: Callable):
             return function()
         # pylint: disable=broad-exception-caught
         except Exception as error:
-            current_app.logger.error(error)
-            current_app.logger.debug(format_exc())
+            sanitized_error = sanitize_error_message(str(error))
+            current_app.logger.error(sanitized_error)
+
+            # Only log full traceback in debug mode, and sanitize it
+            if current_app.debug:
+                sanitized_traceback = sanitize_error_message(format_exc())
+                current_app.logger.debug(sanitized_traceback)
+
             try:
                 provider = APIProviders.get_provider()
                 msg = f"An error occurred when trying to update record, see: {provider.doc}"
@@ -63,7 +79,6 @@ def handle_exceptions(function: Callable):
                 ...
             for kind, response in mapper.items():
                 if isinstance(error, kind):
-                    current_app.logger.error(error)
                     return response
             raise error  # pragma: no cover
 

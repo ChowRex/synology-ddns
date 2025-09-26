@@ -15,7 +15,7 @@ jobs:
           python-version: "3.9"
       - name: Install dependencies
         run: |
-          pip install -r tests/requirements.txt
+          pip install -r requirements.lock
       - name: Run tests with coverage
         env:
           SYNO_DDNS_HOSTNAME: ${{ secrets.SYNO_DDNS_HOSTNAME }}

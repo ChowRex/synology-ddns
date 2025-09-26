@@ -13,6 +13,7 @@ CloudFlare API provider, go to `Cloudflare Fundamentals docs`_ for more details.
 __all__ = ["CloudFlareDDNS"]
 
 from typing import Union, Dict
+from threading import Lock
 
 from cloudflare import APIConnectionError, PermissionDeniedError, InternalServerError
 from cloudflare import AuthenticationError, BadRequestError, RateLimitError
@@ -38,10 +39,13 @@ class CloudFlareDDNS(AbstractDDNSProvider):
     _ENV_ACCOUNT_ID: str = "CLOUDFLARE_ACCOUNT_ID"
     _instance: Union[AbstractDDNSProvider, None] = None
     _initialized: bool = False
+    _lock = Lock()
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
-            cls._instance = super().__new__(cls)
+            with cls._lock:
+                if cls._instance is None:
+                    cls._instance = super().__new__(cls)
         return cls._instance
 
     def __init__(self):
@@ -181,7 +185,7 @@ class CloudFlareDDNS(AbstractDDNSProvider):
             "zone_id": self._get_zone_id(),
             "name": params.hostname,
             "type": kind,
-            "content": params.myip
+            "content": params.myip,
         }
         record = self.client.dns.records.create(**kwargs)
         self._records[params.hostname] = record.id
@@ -198,7 +202,7 @@ class CloudFlareDDNS(AbstractDDNSProvider):
             "zone_id": self._get_zone_id(),
             "name": params.hostname,
             "type": kind,
-            "content": params.myip
+            "content": params.myip,
         }
         self.client.dns.records.edit(**kwargs)
 
@@ -209,7 +213,7 @@ class CloudFlareDDNS(AbstractDDNSProvider):
         """
         kwargs = {
             "zone_id": self._get_zone_id(),
-            "dns_record_id": self._get_record_id()
+            "dns_record_id": self._get_record_id(),
         }
         self.client.dns.records.delete(**kwargs)
         if params.hostname in self._records:

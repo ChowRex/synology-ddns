@@ -46,6 +46,7 @@ class ResponseString(Enum):
             badconn - Failed to connect to provider because connection timeout.
 
     """
+
     OK = "good"
     NO_CHANGE = "nochg"
     NO_HOST = "nohost"

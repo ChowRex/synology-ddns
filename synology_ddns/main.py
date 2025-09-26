@@ -9,15 +9,18 @@ Main function
 """
 from pathlib import Path
 
-from flask import Flask, request
+from flask import Flask, request, jsonify
 
+from . import __version__
 from ._deco import handle_exceptions
 from ._verify import APIProviders
+from .logging_config import setup_logging
 
 app = Flask(__name__)
+setup_logging(app)
 
 
-@app.route('/', methods=["GET"])
+@app.route("/", methods=["GET"])
 @handle_exceptions
 def root():
     """
@@ -35,3 +38,18 @@ def root():
             return _.read()
     provider = APIProviders.get_provider()
     return provider.update()
+
+
+@app.route("/version", methods=["GET"])
+def version():
+    """
+    Return version information
+    :return: JSON response with version info
+    """
+    return jsonify(
+        {
+            "version": __version__,
+            "name": "synology-ddns",
+            "description": "Synology DSM DDNS custom provider for CloudFlare",
+        }
+    )
